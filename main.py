@@ -5,8 +5,11 @@ Pure Python 3 standard library only. No network, no randomness, no clock.
 Text is drawn with a small 5x7 bitmap font defined below (ASCII only).
 40 stories: 6 fuller top stories + 34 compact one-line items in 7 regional
 sections. All items are from named sources dated 24 Nov 2026 (see REPORT.md).
-Run:  python3 main.py   -> writes ./entry.png in the current working folder.
+Run:  python3 main.py   -> writes entry.png to $MAKEFUN_OUTPUT_DIR when set,
+else to /output when that directory exists, else to the working folder.
+The image bytes are identical wherever they are written.
 """
+import os
 import struct
 import zlib
 
@@ -344,7 +347,10 @@ def main():
     png += chunk(b"IDAT", zlib.compress(bytes(raw), 9))
     png += chunk(b"IEND", b"")
 
-    with open("entry.png", "wb") as f:
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or (
+        "/output" if os.path.isdir("/output") else "."
+    )
+    with open(os.path.join(out_dir, "entry.png"), "wb") as f:
         f.write(png)
 
 
